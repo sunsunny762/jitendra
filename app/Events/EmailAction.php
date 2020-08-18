@@ -8,7 +8,7 @@ class EmailAction
 {
     use SerializesModels;
     
-    public $user;
+    public $id;
     public $password;
 
     /**
@@ -16,9 +16,9 @@ class EmailAction
      *
      * @return void
      */
-    public function __construct($user,$password)
+    public function __construct($id,$password)
     {
-        $this->user = $user;
+        $this->id = $id;
         $this->password = $password;
     }
 

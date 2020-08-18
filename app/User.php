@@ -109,16 +109,14 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user list based on search criteria.
+     * Get the user list .
      * @param  \Illuminate\Http\Request  $request
      * @return object App\User
      */
     public function getResult($request)
     {
-        // Fetch users list
         $users = new User;
 
-        // Status
         if ($request->get('status') !== null) {
             $users = $users->where('status', $request->get('status'));
         }

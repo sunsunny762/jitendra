@@ -1,12 +1,16 @@
 <?php
 
 namespace App\Listeners;
-use App\Event\EmailAction;
+use App\Events\EmailAction;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Notifications\EmailNotification;
+use Illuminate\Notifications\Notifiable;
+use App\User;
 
 class EmailActionListener
 {
+    use Notifiable;
     /**
      * Create the event listener.
      *
@@ -25,6 +29,7 @@ class EmailActionListener
      */
     public function handle(EmailAction $event)
     {
-        
+        $user = User::find($event->id);
+        $user->notify(new EmailNotification($event->password));
     }
 }

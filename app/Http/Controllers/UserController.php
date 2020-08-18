@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\User;
-use App\Notification\EmailNotification;
+use App\Events\EmailAction;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -58,20 +60,21 @@ class UserController extends Controller
 
             // Update user data.
             $data = $request->all();
-            $password = str_random(8);
-            $data['deleted_at'] = null;
-            $data['password'] = Hash::make($password);
-            $data['status'] = 0;
-            $data['user_type_id'] = 2;
             $user->fill($data);
             $user->save();
             $message = 'user.restored_success';
-            $user->notify(new EmailNotification($password));
+            
         } else {
             // Save the User Data
             $user = new User;
-            $user->fill($request->all());
-            $user->save();
+            $data = $request->all();
+            $password = Str::random(8);
+            $data['password'] = Hash::make($password);
+            $data['user_type_id'] = 2;
+            $user->fill($data);
+            if ($user->save()) {
+                event(new EmailAction($user->id,$password));
+            }
             $message = 'user.create_success';
         }
 
@@ -107,7 +110,7 @@ class UserController extends Controller
         $request = $this->stripHtmlTags($request, User::$notStripTags);
         $id = $user->id;
         $rules = [
-            'email' => "required|email:rfc,dns|unique:users,email,{$id},id,deleted_at,NULL",
+            'email' => "required|email:rfc,dns|unique:users,email,id",
             'first_name' => 'required'
         ];
         $this->validate($request, $rules);
