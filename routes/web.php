@@ -20,7 +20,7 @@ Route::get('logout', 'Auth\LoginController@logout');
 
 Auth::routes(['verify' => true, 'register' => false]);
 
-Route::middleware(['auth', 'verified', 'web'])->group(function () {
+Route::middleware(['auth', 'web'])->group(function () {
     /*
     * Dashboard Routes...
     */
